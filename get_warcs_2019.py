@@ -14,8 +14,6 @@ import os
 warcs = []
 num_warcs = 0
 download_all_files = 'n'
-
-# query parameters
 crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
@@ -130,72 +128,78 @@ def request_dates(request_string):
     request_string += "&crawl-time-after=" + str(crawl_time_after) + "&crawl-time-before=" + str(crawl_time_before)
     
     request(request_string)
+
+# main function    
+def main():
+    global num_warcs
     
-     
-# Prompt for collection number
-collnum = collnum_prompt()
-
-# Initial request
-request_string = 'https://warcs.archive-it.org/wasapi/v1/webdata?collection=' + str(collnum)
-request(request_string)
-
-# If 0 files, do nothing
-if num_warcs == 0:
-    print("\nNo WARC files in collection " + str(collnum) + "; exiting.")
-# If files found continue
-else:
-    # Must narrow by date if 100 or more files; indicates incomplete API result.
-    while num_warcs == 100:
-        print(("\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
-        request_dates(request_string)
-        if num_warcs == 0:
-            print("\nDate range too narrow; try again.")
-            num_warcs = 100      
-    # Give option to narrow by date anyway        
-    while True:
-        try:
-            narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
-            if narrow_by_date.lower() == 'y':
-                 request_dates(request_string)
-                 while num_warcs == 0:
-                     print("\nDate range too narrow; try again.")
+    # Prompt for collection number
+    collnum = collnum_prompt()
+    
+    # Initial request
+    request_string = 'https://warcs.archive-it.org/wasapi/v1/webdata?collection=' + str(collnum)
+    request(request_string)
+    
+    # If 0 files, do nothing
+    if num_warcs == 0:
+        print("\nNo WARC files in collection " + str(collnum) + "; exiting.")
+    # If files found continue
+    else:
+        # Must narrow by date if 100 or more files; indicates incomplete API result.
+        while num_warcs == 100:
+            print(("\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
+            request_dates(request_string)
+            if num_warcs == 0:
+                print("\nDate range too narrow; try again.")
+                num_warcs = 100      
+        # Give option to narrow by date anyway        
+        while True:
+            try:
+                narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
+                if narrow_by_date.lower() == 'y':
                      request_dates(request_string)
-                 break
-            elif narrow_by_date == 'n':
-                break
-        except:
-            pass
-            
-    download_all_files = download_all_files_prompt()
+                     while num_warcs == 0:
+                         print("\nDate range too narrow; try again.")
+                         request_dates(request_string)
+                     break
+                elif narrow_by_date == 'n':
+                    break
+            except:
+                pass
         
-    if download_all_files == 'y':  
-        for warc in warcs:
-            url = warc['file']
-            size = size_string(int(warc['size']))
-    
-            # Get file name
-            filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
+        # Prompt user to download files        
+        download_all_files = download_all_files_prompt()
             
-            
-            # Download file
-            print('\nDownloading ' + filename + ' (' + size + '...')
-            r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
-                        
-            # Write downloaded file
-            cwd = os.getcwd()
-            with open(cwd + '/' + filename, 'wb') as f:  
-                f.write(r.content)
-            
-            # Open, close, read file and calculate MD5 on its contents 
-            with open(filename, 'rb') as file_to_check:
-                # read contents of the file
-                data = file_to_check.read()    
-                # pipe contents of the file through
-                md5_returned = hashlib.md5(data).hexdigest()
-                if md5_returned == warc['md5']:
-                    print("md5 match: " + md5_returned)
-                else:
-                    print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
-    
-    
+        if download_all_files == 'y':  
+            for warc in warcs:
+                url = warc['file']
+                size = size_string(int(warc['size']))
+        
+                # Get file name
+                filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
+                
+                
+                # Download file
+                print('\nDownloading ' + filename + ' (' + size + '...')
+                r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+                            
+                # Write downloaded file
+                cwd = os.getcwd()
+                with open(cwd + '/' + filename, 'wb') as f:  
+                    f.write(r.content)
+                
+                # Open, close, read file and calculate MD5 on its contents 
+                with open(filename, 'rb') as file_to_check:
+                    # read contents of the file
+                    data = file_to_check.read()    
+                    # pipe contents of the file through
+                    md5_returned = hashlib.md5(data).hexdigest()
+                    if md5_returned == warc['md5']:
+                        print("md5 match: " + md5_returned)
+                    else:
+                        print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
+        
+
+if __name__== "__main__":
+     main()
         
