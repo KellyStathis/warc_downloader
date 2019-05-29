@@ -17,7 +17,7 @@ download_all_files = 'n'
 crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
-cwd
+collection_cwd = ""
 
 # prompt functions
 def collnum_prompt():
@@ -132,18 +132,17 @@ def request_dates(request_string):
     
 # file download function
 def download_metadata_file(url, crawl_num):
-    global cwd
-
     r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
     # Write downloaded file
     filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
     print('\nDownloading ' + filename + "...")
-    with open(cwd + '/' + filename, 'wb') as f:  
+    with open(os.getcwd() + '/' + filename, 'wb') as f:  
         f.write(r.content)
 
 # main function    
 def main():
     global num_warcs
+    global collection_cwd
     
     # Prompt for collection number
     collnum = collnum_prompt()
@@ -182,11 +181,20 @@ def main():
         # Prompt user to download files        
         download_all_files = download_all_files_prompt()
             
-        if download_all_files == 'y':  
+        if download_all_files == 'y':
+            collection_folder = "ARCHIVEIT-" + str(collnum)
+            try:
+                os.mkdir(collection_folder)
+            except:
+                pass
+            os.chdir(collection_folder)
+            collection_cwd = os.getcwd()
+            
             for warc in warcs:
                 url = warc['file']
                 size = size_string(int(warc['size']))
-                cwd = os.getcwd()
+                crawl_num = warc['crawl']
+                os.chdir(collection_cwd)
         
                 # Get file name
                 filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
@@ -195,9 +203,21 @@ def main():
                 print('\nDownloading ' + filename + ' (' + size + '...')
                 r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
                             
-                # Write downloaded file    
-                with open(cwd + '/' + filename, 'wb') as f:  
-                    f.write(r.content)
+                # Make directory and write downloaded file    
+                # If no crawl ID, download to collection folder:
+                if type(crawl_num) != int:
+                    with open(os.getcwd() + '/' + filename, 'wb') as f:  
+                        f.write(r.content)
+                # If crawl ID, download to JOB folder
+                else:
+                    crawl_folder = "JOB" + str(crawl_num)
+                    try:
+                        os.mkdir(crawl_folder)
+                    except:
+                        pass
+                    os.chdir(crawl_folder)
+                    with open(os.getcwd() + '/' + filename, 'wb') as f:  
+                        f.write(r.content)
                 
                 # Open, close, read file and calculate MD5 on its contents 
                 with open(filename, 'rb') as file_to_check:
@@ -211,8 +231,7 @@ def main():
                         print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
                         
                 # Download crawl metadata
-                if type(warc['crawl']) == int:
-                    crawl_num = warc['crawl']
+                if type(crawl_num) == int:
                    
                     # Download seed, host, and mimetype lists
                     # TODO: Ensure this doesn't download the lists multiple times for crawls with multiple WARCs
