@@ -17,6 +17,7 @@ download_all_files = 'n'
 crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
+cwd
 
 # prompt functions
 def collnum_prompt():
@@ -128,6 +129,17 @@ def request_dates(request_string):
     request_string += "&crawl-time-after=" + str(crawl_time_after) + "&crawl-time-before=" + str(crawl_time_before)
     
     request(request_string)
+    
+# file download function
+def download_metadata_file(url, crawl_num):
+    global cwd
+
+    r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+    # Write downloaded file
+    filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
+    print('\nDownloading ' + filename + "...")
+    with open(cwd + '/' + filename, 'wb') as f:  
+        f.write(r.content)
 
 # main function    
 def main():
@@ -202,35 +214,15 @@ def main():
                 if type(warc['crawl']) == int:
                     crawl_num = warc['crawl']
                    
-                    # Download seed list
-                    # TODO: Ensure this doesn't download the seed list multiple times for crawls with multiple WARCs
+                    # Download seed, host, and mimetype lists
+                    # TODO: Ensure this doesn't download the lists multiple times for crawls with multiple WARCs
                     seed_list_url = 'https://partner.archive-it.org/api/reports/seed/' + str(crawl_num) + '?format=csv&offset=0&limit=1'
-                    r = requests.get(seed_list_url, auth=('kelly.stathis', 'DIwarc19$'))
-                    # Write downloaded file
-                    seed_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
-                    print('\nDownloading ' + seed_list_filename + "...")
-                    with open(cwd + '/' + seed_list_filename, 'wb') as f:  
-                        f.write(r.content)
-                        
-                    # Download host list
-                    # TODO: Ensure this doesn't download the host list multiple times for crawls with multiple WARCs
                     host_list_url = 'https://partner.archive-it.org/api/reports/host/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
-                    r = requests.get(host_list_url, auth=('kelly.stathis', 'DIwarc19$'))
-                    # Write downloaded file
-                    host_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
-                    print('\nDownloading ' + host_list_filename + "...")
-                    with open(cwd + '/' + host_list_filename, 'wb') as f:  
-                        f.write(r.content)
-                    
-                    # Download mimetype list
-                    # TODO: Ensure this doesn't download the mimetype type list multiple times for crawls with multiple WARCs
                     mimetype_list_url = 'https://partner.archive-it.org/api/reports/mimetype/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
-                    r = requests.get(mimetype_list_url, auth=('kelly.stathis', 'DIwarc19$'))
-                    # Write downloaded file
-                    mimetype_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
-                    print('\nDownloading ' + mimetype_list_filename + "...")
-                    with open(cwd + '/' + mimetype_list_filename, 'wb') as f:  
-                        f.write(r.content)
+                   
+                    download_metadata_file(seed_list_url, crawl_num)
+                    download_metadata_file(host_list_url, crawl_num)
+                    download_metadata_file(mimetype_list_url, crawl_num)
         
 
 if __name__== "__main__":
