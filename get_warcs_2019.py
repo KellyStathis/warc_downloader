@@ -138,6 +138,14 @@ def download_metadata_file(url, crawl_num):
     print('\nDownloading ' + filename + "...")
     with open(os.getcwd() + '/' + filename, 'wb') as f:  
         f.write(r.content)
+        
+# warc write function
+def write_warc(filename, r):
+     with open(os.getcwd() + '/' + filename, 'wb') as f:  
+         # COMMENT OUT TO TEST
+         f.write(r.content)
+         # COMMENT TO RUN
+         #print("write_warc not writing for test")
 
 # main function    
 def main():
@@ -202,25 +210,23 @@ def main():
                 
                 # Download file
                 print('\nDownloading ' + filename + ' (' + size + '...')
-#               r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+                
+                # COMMENT OUT TO TEXT
+                r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+                # COMMENT TO RUN
+                #r = ""
                             
                 # Make directory and write downloaded file    
-                # If no crawl ID, download to collection folder:
-                if type(crawl_num) != int:
-                    with open(os.getcwd() + '/' + filename, 'wb') as f:  
-                         print("Not writing " + filename + " for testing; uncomment next line")
-#                        f.write(r.content)
-                # If crawl ID, download to JOB folder
-                else:
+                # If crawl ID, download to JOB folder. Otherwise, just download to collection folder:
+                if type(crawl_num) == int:
                     crawl_folder = "JOB" + str(crawl_num)
                     try:
                         os.mkdir(crawl_folder)
                     except:
                         pass
                     os.chdir(crawl_folder)
-                    with open(os.getcwd() + '/' + filename, 'wb') as f:  
-                         print("Not writing " + filename + " for testing; uncomment next line")
-#                        f.write(r.content)
+                
+                write_warc(filename, r)
                 
                 # Open, close, read file and calculate MD5 on its contents 
                 with open(filename, 'rb') as file_to_check:
