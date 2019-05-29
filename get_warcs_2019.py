@@ -114,7 +114,7 @@ def request(request_string):
     
     # Build the list of warcs
     for file in files:
-        warcs.append({'file': file['locations'][0], 'md5': file['checksums']['md5'], 'size': file['size']})
+        warcs.append({'file': file['locations'][0], 'md5': file['checksums']['md5'], 'size': file['size'], 'crawl': file['crawl']})
         total_size += file['size']
     
     num_warcs = len(warcs)
@@ -174,6 +174,7 @@ def main():
             for warc in warcs:
                 url = warc['file']
                 size = size_string(int(warc['size']))
+                cwd = os.getcwd()
         
                 # Get file name
                 filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
@@ -183,8 +184,7 @@ def main():
                 print('\nDownloading ' + filename + ' (' + size + '...')
                 r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
                             
-                # Write downloaded file
-                cwd = os.getcwd()
+                # Write downloaded file    
                 with open(cwd + '/' + filename, 'wb') as f:  
                     f.write(r.content)
                 
@@ -198,6 +198,20 @@ def main():
                         print("md5 match: " + md5_returned)
                     else:
                         print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
+                        
+                # Download crawl metadata
+                if type(warc['crawl']) == int:
+                    crawl_num = warc['crawl']
+                   
+                    # Download seed list
+                    # TODO: Ensure this doesn't download the seed list multiple times for crawls with multiple WARCs
+                    seed_list_url = 'https://partner.archive-it.org/api/reports/seed/' + str(crawl_num) + '?format=csv&offset=0&limit=1'
+                    r = requests.get(seed_list_url, auth=('kelly.stathis', 'DIwarc19$'))
+                    # Write downloaded file
+                    seed_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
+                    print('\nDownloading ' + seed_list_filename + "...")
+                    with open(cwd + '/' + seed_list_filename, 'wb') as f:  
+                        f.write(r.content)
         
 
 if __name__== "__main__":
