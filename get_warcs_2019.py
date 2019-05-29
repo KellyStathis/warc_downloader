@@ -179,7 +179,6 @@ def main():
                 # Get file name
                 filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
                 
-                
                 # Download file
                 print('\nDownloading ' + filename + ' (' + size + '...')
                 r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
@@ -211,6 +210,26 @@ def main():
                     seed_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
                     print('\nDownloading ' + seed_list_filename + "...")
                     with open(cwd + '/' + seed_list_filename, 'wb') as f:  
+                        f.write(r.content)
+                        
+                    # Download host list
+                    # TODO: Ensure this doesn't download the host list multiple times for crawls with multiple WARCs
+                    host_list_url = 'https://partner.archive-it.org/api/reports/host/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
+                    r = requests.get(host_list_url, auth=('kelly.stathis', 'DIwarc19$'))
+                    # Write downloaded file
+                    host_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
+                    print('\nDownloading ' + host_list_filename + "...")
+                    with open(cwd + '/' + host_list_filename, 'wb') as f:  
+                        f.write(r.content)
+                    
+                    # Download mimetype list
+                    # TODO: Ensure this doesn't download the mimetype type list multiple times for crawls with multiple WARCs
+                    mimetype_list_url = 'https://partner.archive-it.org/api/reports/mimetype/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
+                    r = requests.get(mimetype_list_url, auth=('kelly.stathis', 'DIwarc19$'))
+                    # Write downloaded file
+                    mimetype_list_filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
+                    print('\nDownloading ' + mimetype_list_filename + "...")
+                    with open(cwd + '/' + mimetype_list_filename, 'wb') as f:  
                         f.write(r.content)
         
 
