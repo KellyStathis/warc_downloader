@@ -143,6 +143,7 @@ def download_metadata_file(url, crawl_num):
 def main():
     global num_warcs
     global collection_cwd
+    crawl_nums = []
     
     # Prompt for collection number
     collnum = collnum_prompt()
@@ -201,13 +202,14 @@ def main():
                 
                 # Download file
                 print('\nDownloading ' + filename + ' (' + size + '...')
-                r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+#               r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
                             
                 # Make directory and write downloaded file    
                 # If no crawl ID, download to collection folder:
                 if type(crawl_num) != int:
                     with open(os.getcwd() + '/' + filename, 'wb') as f:  
-                        f.write(r.content)
+                         print("Not writing " + filename + " for testing; uncomment next line")
+#                        f.write(r.content)
                 # If crawl ID, download to JOB folder
                 else:
                     crawl_folder = "JOB" + str(crawl_num)
@@ -217,7 +219,8 @@ def main():
                         pass
                     os.chdir(crawl_folder)
                     with open(os.getcwd() + '/' + filename, 'wb') as f:  
-                        f.write(r.content)
+                         print("Not writing " + filename + " for testing; uncomment next line")
+#                        f.write(r.content)
                 
                 # Open, close, read file and calculate MD5 on its contents 
                 with open(filename, 'rb') as file_to_check:
@@ -231,10 +234,9 @@ def main():
                         print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
                         
                 # Download crawl metadata
-                if type(crawl_num) == int:
+                if type(crawl_num) == int and crawl_num not in crawl_nums:
                    
                     # Download seed, host, and mimetype lists
-                    # TODO: Ensure this doesn't download the lists multiple times for crawls with multiple WARCs
                     seed_list_url = 'https://partner.archive-it.org/api/reports/seed/' + str(crawl_num) + '?format=csv&offset=0&limit=1'
                     host_list_url = 'https://partner.archive-it.org/api/reports/host/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
                     mimetype_list_url = 'https://partner.archive-it.org/api/reports/mimetype/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
@@ -242,6 +244,8 @@ def main():
                     download_metadata_file(seed_list_url, crawl_num)
                     download_metadata_file(host_list_url, crawl_num)
                     download_metadata_file(mimetype_list_url, crawl_num)
+                    
+                    crawl_nums.append(crawl_num)
         
 
 if __name__== "__main__":
