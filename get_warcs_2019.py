@@ -57,7 +57,8 @@ def crawl_time_after_prompt():
 def download_all_files_prompt():
     while True:
         try:
-            download_all_files = str(input('Download all files? Enter y or n: '))
+            download_all_files = str(input(
+                    'Download all files? Enter y or n: '))
             if download_all_files.lower() == 'y':
                 num_warcs == len(warcs)
                 return download_all_files
@@ -119,18 +120,22 @@ def request(request_string):
     
     # Build the list of warcs
     for file in files:
-        warcs.append({'file': file['locations'][0], 'md5': file['checksums']['md5'], 'size': file['size'], 'crawl': file['crawl']})
+        warcs.append({'file': file['locations'][0], 
+                      'md5': file['checksums']['md5'], 'size': file['size'], 
+                      'crawl': file['crawl']})
         total_size += file['size']
     
     num_warcs = len(warcs)
-    print("\nQuery returned " + str(num_warcs) + " WARC files, totalling " + size_string(total_size))
+    print("\nQuery returned " + str(num_warcs) + " WARC files, totalling "
+          + size_string(total_size))
     
 def request_dates(request_string):    
     global crawl_time_after, crawl_time_before
  
     crawl_time_after = crawl_time_after_prompt()
     crawl_time_before = crawl_time_before_prompt()
-    request_string += "&crawl-time-after=" + str(crawl_time_after) + "&crawl-time-before=" + str(crawl_time_before)
+    request_string += ("&crawl-time-after=" + str(crawl_time_after) 
+                    + "&crawl-time-before=" + str(crawl_time_before))
     
     request(request_string)
     
@@ -138,7 +143,8 @@ def request_dates(request_string):
 def download_metadata_file(url, crawl_num):
     r = requests.get(url, auth=(archive_it_user, archive_it_pw))
     # Write downloaded file
-    filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
+    filename = r.headers.get('content-disposition').split("filename=")[1] \
+                        .split("\"")[1].replace(":", "_")
     print('\nDownloading ' + filename + "...")
     with open(os.getcwd() + '/' + filename, 'wb') as f:  
         f.write(r.content)
@@ -236,7 +242,7 @@ def main():
                 #r = ""
                             
                 # Make directory and write downloaded file    
-                # If crawl ID, download to JOB folder. Otherwise, just download to collection folder:
+                # If crawl ID, download to JOB folder, not collection folder
                 if type(crawl_num) == int:
                     crawl_folder = "JOB" + str(crawl_num)
                     try:
@@ -256,15 +262,19 @@ def main():
                     if md5_returned == warc['md5']:
                         print("md5 match: " + md5_returned)
                     else:
-                        print("IMPORTANT: md5 fail: " + md5_returned + " should be " + warc['md5'])
+                        print("IMPORTANT: md5 fail: " + md5_returned 
+                              + " should be " + warc['md5'])
                         
                 # Download crawl metadata
                 if type(crawl_num) == int and crawl_num not in crawl_nums:
                    
                     # Download seed, host, and mimetype lists
-                    seed_list_url = 'https://partner.archive-it.org/api/reports/seed/' + str(crawl_num) + '?format=csv&offset=0&limit=1'
-                    host_list_url = 'https://partner.archive-it.org/api/reports/host/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
-                    mimetype_list_url = 'https://partner.archive-it.org/api/reports/mimetype/' + str(crawl_num) + '?format=csv&offset=0&limit=3'
+                    seed_list_url = ('https://partner.archive-it.org/api/reports/seed/' 
+                                     + str(crawl_num) + '?format=csv&offset=0&limit=1')
+                    host_list_url = ('https://partner.archive-it.org/api/reports/host/' 
+                                     + str(crawl_num) + '?format=csv&offset=0&limit=3')
+                    mimetype_list_url = ('https://partner.archive-it.org/api/reports/mimetype/' 
+                                         + str(crawl_num) + '?format=csv&offset=0&limit=3')
                    
                     download_metadata_file(seed_list_url, crawl_num)
                     download_metadata_file(host_list_url, crawl_num)
