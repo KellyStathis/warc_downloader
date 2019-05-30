@@ -1,1 +1,3 @@
 archiveit.env
+*.warc.gz
+*.csv
