@@ -236,7 +236,7 @@ def main():
                 # Download file
                 print('\nDownloading ' + filename + ' (' + size + '...')
                 
-                # COMMENT OUT TO TEXT
+                # COMMENT OUT TO TEST
                 r = requests.get(url, auth=(archive_it_user, archive_it_pw))
                 # COMMENT TO RUN
                 #r = ""

@@ -1,3 +1,6 @@
 archiveit.env
 *.warc.gz
 *.csv
+*.txt
+*.xml
+*.ods
