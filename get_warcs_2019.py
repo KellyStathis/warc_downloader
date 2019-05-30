@@ -18,6 +18,10 @@ crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
 collection_cwd = ""
+env_file = "archiveit.env"
+env_vars = {}
+archive_it_user = ""
+archive_it_pw = ""
 
 # prompt functions
 def collnum_prompt():
@@ -109,7 +113,7 @@ def request(request_string):
     total_size = 0
     
     print("\nRequest string: " + request_string)
-    r = requests.get(request_string, auth=('kelly.stathis', 'DIwarc19$'))
+    r = requests.get(request_string, auth=(archive_it_user, archive_it_pw))
     r_json = r.json()
     files = r_json['files']
     
@@ -132,7 +136,7 @@ def request_dates(request_string):
     
 # file download function
 def download_metadata_file(url, crawl_num):
-    r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+    r = requests.get(url, auth=(archive_it_user, archive_it_pw))
     # Write downloaded file
     filename = r.headers.get('content-disposition').split("filename=")[1].split("\"")[1].replace(":", "_")
     print('\nDownloading ' + filename + "...")
@@ -151,7 +155,22 @@ def write_warc(filename, r):
 def main():
     global num_warcs
     global collection_cwd
+    global archive_it_user
+    global archive_it_pw
     crawl_nums = []
+    
+    # Get username and password from archiveit.env file
+    with open(env_file) as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            key, value = line.strip().split('=', 1)
+            # os.environ[key] = value  # Load to local environ
+            #env_vars.append({'name': key, 'value': value}) # Save to a list
+            env_vars[key] = value
+    
+    archive_it_user = env_vars['ARCHIVE-IT-USER']
+    archive_it_pw = env_vars['ARCHIVE-IT-PWD']
     
     # Prompt for collection number
     collnum = collnum_prompt()
@@ -212,7 +231,7 @@ def main():
                 print('\nDownloading ' + filename + ' (' + size + '...')
                 
                 # COMMENT OUT TO TEXT
-                r = requests.get(url, auth=('kelly.stathis', 'DIwarc19$'))
+                r = requests.get(url, auth=(archive_it_user, archive_it_pw))
                 # COMMENT TO RUN
                 #r = ""
                             
