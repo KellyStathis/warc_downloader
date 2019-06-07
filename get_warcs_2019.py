@@ -198,6 +198,7 @@ def main():
                 print("\nDate range too narrow; try again.")
                 num_warcs = 100      
         # Give option to narrow by date anyway        
+        # TODO Fix while logic; sometimes loops before request_dates returns
         while True:
             try:
                 narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
@@ -244,13 +245,25 @@ def main():
                 # Make directory and write downloaded file    
                 # If crawl ID, download to JOB folder, not collection folder
                 if type(crawl_num) == int:
-                    crawl_folder = "JOB" + str(crawl_num)
+                    crawl_folder = "ARCHIVEIT_COLLECTION-" + str(collnum) + "_JOB-" + str(crawl_num)
                     try:
                         os.mkdir(crawl_folder)
                     except:
                         pass
                     os.chdir(crawl_folder)
+                    try:
+                        os.mkdir("objects")
+                    except:
+                        pass
+                    try:
+                        os.mkdir("metadata")
+                        os.chdir("metadata")
+                        os.mkdir("submissionDocumentation")
+                        os.chdir('..')
+                    except:
+                        pass
                 
+                os.chdir("objects")
                 write_warc(filename, r)
                 
                 # Open, close, read file and calculate MD5 on its contents 
@@ -264,7 +277,9 @@ def main():
                     else:
                         print("IMPORTANT: md5 fail: " + md5_returned 
                               + " should be " + warc['md5'])
-                        
+                 
+                os.chdir("..")
+                os.chdir("metadata/submissionDocumentation")
                 # Download crawl metadata
                 if type(crawl_num) == int and crawl_num not in crawl_nums:
                    
