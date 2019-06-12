@@ -262,8 +262,8 @@ def main():
                         os.chdir('..')
                     except:
                         pass
-                
-                os.chdir("objects")
+                    os.chdir("objects")
+                    
                 write_warc(filename, r)
                 
                 # Open, close, read file and calculate MD5 on its contents 
