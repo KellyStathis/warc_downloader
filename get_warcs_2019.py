@@ -277,11 +277,11 @@ def main():
                     else:
                         print("IMPORTANT: md5 fail: " + md5_returned 
                               + " should be " + warc['md5'])
-                 
-                os.chdir("..")
-                os.chdir("metadata/submissionDocumentation")
+                   
                 # Download crawl metadata
                 if type(crawl_num) == int and crawl_num not in crawl_nums:
+                    os.chdir("..")
+                    os.chdir("metadata/submissionDocumentation")
                    
                     # Download seed, host, and mimetype lists
                     seed_list_url = ('https://partner.archive-it.org/api/reports/seed/' 
