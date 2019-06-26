@@ -18,7 +18,7 @@ crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
 collection_cwd = ""
-env_file = "archiveit.env"
+env_file = "credentials.env"
 env_vars = {}
 archive_it_user = ""
 archive_it_pw = ""
@@ -165,7 +165,7 @@ def main():
     global archive_it_pw
     crawl_nums = []
     
-    # Get username and password from archiveit.env file
+    # Get username and password from credentials.env file
     with open(env_file) as f:
         for line in f:
             if line.startswith('#'):
