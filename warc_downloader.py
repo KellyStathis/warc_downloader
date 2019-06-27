@@ -207,16 +207,16 @@ def main():
                      while num_warcs == 0:
                          print("\nDate range too narrow; try again.")
                          request_dates(request_string)
-                     break
+                     #break
                 elif narrow_by_date == 'n':
                     break
             except:
                 pass
         
         # Prompt user to download files        
-        download_all_files = download_all_files_prompt()
+        download_files = download_files_prompt()
             
-        if download_all_files == 'y':
+        if download_files == 'y':
             collection_folder = "ARCHIVEIT-" + str(collnum)
             try:
                 os.mkdir(collection_folder)
