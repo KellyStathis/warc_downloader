@@ -13,7 +13,7 @@ import os
 # global variables
 warcs = []
 num_warcs = 0
-download_all_files = 'n'
+download_files = 'n'
 crawl_time_after = 0
 crawl_time_before = 0
 collnum = -1
@@ -54,17 +54,17 @@ def crawl_time_after_prompt():
         except:
             pass
 
-def download_all_files_prompt():
+def download_files_prompt():
     while True:
         try:
-            download_all_files = str(input(
-                    'Download all files? Enter y or n: '))
-            if download_all_files.lower() == 'y':
+            download_files = str(input(
+                    'Download files? Enter y or n: '))
+            if download_files.lower() == 'y':
                 num_warcs == len(warcs)
-                return download_all_files
+                return download_files
                 break
-            elif download_all_files == 'n':
-                return download_all_files
+            elif download_files == 'n':
+                return download_files
                 break
         except:
             pass
@@ -196,7 +196,7 @@ def main():
             request_dates(request_string)
             if num_warcs == 0:
                 print("\nDate range too narrow; try again.")
-                num_warcs = 100      
+                num_warcs = 100
         # Give option to narrow by date anyway        
         # TODO Fix while logic; sometimes loops before request_dates returns
         while True:
