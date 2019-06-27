@@ -73,9 +73,9 @@ def download_all_files_prompt():
 def size_string(byte_size):
     megabyte_size = megabyte(byte_size)
     if megabyte_size > 1000:
-        return str(gigabyte(byte_size)) + "GB"
+        return "{0:.3f}".format(gigabyte(byte_size)) + "GB"
     else:
-        return str(megabyte_size) + "MB"
+        return "{0:.3f}".format(megabyte_size) + "MB"
     
 def megabyte(byte_size):
     return byte_size / 1000000
@@ -235,7 +235,7 @@ def main():
                 filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
                 
                 # Download file
-                print('\nDownloading ' + filename + ' (' + size + '...')
+                print('\nDownloading ' + filename + ' (' + size + ')...')
                 
                 # COMMENT OUT TO TEST
                 r = requests.get(url, auth=(archive_it_user, archive_it_pw))
