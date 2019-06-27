@@ -73,9 +73,9 @@ def download_all_files_prompt():
 def size_string(byte_size):
     megabyte_size = megabyte(byte_size)
     if megabyte_size > 1000:
-        return "{0:.3f}".format(gigabyte(byte_size)) + "GB"
+        return "{0:.3f}".format(gigabyte(byte_size)) + " GB"
     else:
-        return "{0:.3f}".format(megabyte_size) + "MB"
+        return "{0:.3f}".format(megabyte_size) + " MB"
     
 def megabyte(byte_size):
     return byte_size / 1000000
