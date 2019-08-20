@@ -9,6 +9,7 @@ Created on Thu May 23 15:42:08 2019
 import requests
 import hashlib
 import os
+from colorama import Fore
 
 # global variables
 warcs = []
@@ -150,7 +151,8 @@ def download_metadata_file(url, crawl_num):
         with open(os.getcwd() + '/' + filename, 'wb') as f:  
             f.write(r.content)
     except:
-        print("\nIMPORTANT: Metadata file not found at url: " + url)
+        print(Fore.RED + "\nIMPORTANT: Metadata file not found at url: " + url)
+        print(Fore.RESET)
         
 # warc write function
 def write_warc(filename, r):
@@ -195,7 +197,8 @@ def main():
     else:
         # Must narrow by date if 100 or more files; indicates incomplete API result.
         while num_warcs == 100:
-            print(("\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
+            print((Fore.RED + "\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
+            print(Fore.RESET)
             request_dates(request_string)
             if num_warcs == 0:
                 print("\nDate range too narrow; try again.")
@@ -278,8 +281,9 @@ def main():
                     if md5_returned == warc['md5']:
                         print("md5 match: " + md5_returned)
                     else:
-                        print("IMPORTANT: md5 fail: " + md5_returned 
+                        print(Fore.RED + "IMPORTANT: md5 fail: " + md5_returned 
                               + " should be " + warc['md5'])
+                        print(Fore.RESET)
                    
                 # Download crawl metadata
                 if type(crawl_num) == int and crawl_num not in crawl_nums:
