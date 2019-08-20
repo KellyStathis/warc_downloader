@@ -143,11 +143,14 @@ def request_dates(request_string):
 def download_metadata_file(url, crawl_num):
     r = requests.get(url, auth=(archive_it_user, archive_it_pw))
     # Write downloaded file
-    filename = r.headers.get('content-disposition').split("filename=")[1] \
+    try:
+        filename = r.headers.get('content-disposition').split("filename=")[1] \
                         .split("\"")[1].replace(":", "_")
-    print('\nDownloading ' + filename + "...")
-    with open(os.getcwd() + '/' + filename, 'wb') as f:  
-        f.write(r.content)
+        print('\nDownloading ' + filename + "...")
+        with open(os.getcwd() + '/' + filename, 'wb') as f:  
+            f.write(r.content)
+    except:
+        print("\nIMPORTANT: Metadata file not found at url: " + url)
         
 # warc write function
 def write_warc(filename, r):
