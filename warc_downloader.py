@@ -292,11 +292,11 @@ def main():
                    
                     # Download seed, host, and mimetype lists
                     seed_list_url = ('https://partner.archive-it.org/api/reports/seed/' 
-                                     + str(crawl_num) + '?format=csv&offset=0&limit=1')
+                                     + str(crawl_num) + '?format=csv&limit=1000000')
                     host_list_url = ('https://partner.archive-it.org/api/reports/host/' 
-                                     + str(crawl_num) + '?format=csv&offset=0&limit=3')
+                                     + str(crawl_num) + '?format=csv&limit=1000000')
                     mimetype_list_url = ('https://partner.archive-it.org/api/reports/mimetype/' 
-                                         + str(crawl_num) + '?format=csv&offset=0&limit=3')
+                                         + str(crawl_num) + '?format=csv&limit=1000000')
                    
                     download_metadata_file(seed_list_url, crawl_num)
                     download_metadata_file(host_list_url, crawl_num)
