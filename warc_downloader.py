@@ -125,7 +125,7 @@ def request(request_string):
     Using request_string, sends GET request to WASAPI and saves:
         - WARC file locations 
         - md5 checksums
-        - file sizes.
+        - file sizes
     
     Updates global variables:
         - warcs: list of above information
@@ -158,7 +158,7 @@ def request(request_string):
     print("\nQuery returned " + str(num_warcs) + " WARC files, totalling "
           + size_string(total_size))
     
-def request_dates(request_string):
+def request_with_dates(request_string):
     """Makes request to WASAPI limited by a date range.
     
     Prompts the user for start and end dates (crawl_time_after and crawl_time_before).
@@ -232,19 +232,19 @@ def main():
         while num_warcs == 100:
             print((Fore.RED + "\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
             print(Fore.RESET)
-            request_dates(request_string)
+            request_with_dates(request_string)
             if num_warcs == 0:
                 print("\nDate range too narrow; try again.")
                 num_warcs = 100
         # Even if there are < 100 files, give option to narrow results by date        
-        while True: # TODO Fix while logic - sometimes loops before request_dates returns
+        while True: # TODO Fix while logic - sometimes loops before request_with_dates changes num_warcs
             try:
                 narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
                 if narrow_by_date.lower() == 'y':
-                     request_dates(request_string)
+                     request_with_dates(request_string)
                      while num_warcs == 0:
                          print("\nDate range too narrow; try again.")
-                         request_dates(request_string)
+                         request_with_dates(request_string)
                 elif narrow_by_date == 'n':
                     break
             except:
