@@ -11,31 +11,37 @@ import hashlib
 import os
 from colorama import Fore
 
-# global variables
+# Global variables
 warcs = []
 num_warcs = 0
 download_files = 'n'
 crawl_time_after = 0
 crawl_time_before = 0
-collnum = -1
+collection_num = -1
 collection_cwd = ""
 env_file = "credentials.env"
 env_vars = {}
 archive_it_user = ""
 archive_it_pw = ""
 
-# prompt functions
-def collnum_prompt():
+def collection_num_prompt():
+    """Prompt the user for the collection number."""
     while True:
         try:
-            collnum = int(input('Enter collection number: '))
-            if collnum > 0:
-                return collnum
+            collection_num = int(input('Enter collection number: '))
+            if collection_num > 0:
+                return collection_num
                 break
         except:
             pass
         
 def crawl_time_before_prompt():
+    """Prompt the user for end date in YYYY-MM-DD format  and returns response if valid.
+    
+    'Before' means that all WARCs before this date are returned by WASAPI.
+    Note that the  end date is not inclusive.
+    For example, to get all files from 2019, use start date 2019-01-01 and end date 2020-01-01.
+    """
     while True:
         try:
             crawl_time_before = str(input('Enter an end date (YYYY-MM-DD): '))
@@ -46,6 +52,10 @@ def crawl_time_before_prompt():
             pass
         
 def crawl_time_after_prompt():
+    """Prompt the user for start date in YYYY-MM-DD format and returns response if valid.
+    
+    'After' means that all WARCs after this date are returned by WASAPI.
+    """
     while True:
         try:
             crawl_time_after = str(input('Enter a start date (YYYY-MM-DD): '))
@@ -56,12 +66,12 @@ def crawl_time_after_prompt():
             pass
 
 def download_files_prompt():
+    """Prompts the user to download files (y or n) and returns result."""
     while True:
         try:
-            download_files = str(input(
-                    'Download files? Enter y or n: '))
+            download_files = str(input('Download files? Enter y or n: '))
             if download_files.lower() == 'y':
-                num_warcs == len(warcs)
+                num_warcs == len(warcs) #TODO: Move this to main?
                 return download_files
                 break
             elif download_files == 'n':
@@ -70,8 +80,8 @@ def download_files_prompt():
         except:
             pass
     
-# byte conversion functions
 def size_string(byte_size):
+    """Returns a string indicating file size in MB or GB."""
     megabyte_size = megabyte(byte_size)
     if megabyte_size > 1000:
         return "{0:.3f}".format(gigabyte(byte_size)) + " GB"
@@ -79,13 +89,15 @@ def size_string(byte_size):
         return "{0:.3f}".format(megabyte_size) + " MB"
     
 def megabyte(byte_size):
+    """Returns bytes converted to megabytes."""
     return byte_size / 1000000
 
 def gigabyte(byte_size):
-     return byte_size / 1000000000
+    """Returns bytes converted to gigabytes."""
+    return byte_size / 1000000000
 
-# date check function
 def is_date(crawl_time):
+    """Returns true if string is in YYYY-MM-DD format and a valid date; false otherwise."""
     ymd = crawl_time.split("-")
     if len(ymd) != 3:
         return False
@@ -107,30 +119,52 @@ def is_date(crawl_time):
         return False
     return True
     
-# request prompt functions
 def request(request_string):
+    """Makes request to WASAPI to get information about WARC files.
+    
+    Using request_string, sends GET request to WASAPI and saves:
+        - WARC file locations 
+        - md5 checksums
+        - file sizes.
+    
+    Updates global variables:
+        - warcs: list of above information
+        - num_warcs: the number of WARC files 
+        
+    Prints the number of WARC files and the total size returned by query.
+    """
     global warcs, num_warcs
     warcs = []
     num_warcs = 0
     total_size = 0
     
+    # Make WASAPI request
     print("\nRequest string: " + request_string)
     r = requests.get(request_string, auth=(archive_it_user, archive_it_pw))
     r_json = r.json()
     files = r_json['files']
     
-    # Build the list of warcs
+    # Build the list of WARCs
     for file in files:
         warcs.append({'file': file['locations'][0], 
                       'md5': file['checksums']['md5'], 'size': file['size'], 
                       'crawl': file['crawl']})
         total_size += file['size']
     
+    # Save the number of WARC files
     num_warcs = len(warcs)
+    
+    # Print results of request
     print("\nQuery returned " + str(num_warcs) + " WARC files, totalling "
           + size_string(total_size))
     
-def request_dates(request_string):    
+def request_dates(request_string):
+    """Makes request to WASAPI limited by a date range.
+    
+    Prompts the user for start and end dates (crawl_time_after and crawl_time_before).
+    Constructs updated request_string using dates.
+    Calls request(request_string).
+    """
     global crawl_time_after, crawl_time_before
  
     crawl_time_after = crawl_time_after_prompt()
@@ -140,8 +174,8 @@ def request_dates(request_string):
     
     request(request_string)
     
-# file download function
-def download_metadata_file(url, crawl_num):
+def download_metadata_file(url, crawl_num): # TODO: don't pass crawl_num
+    """Download the metadata file at url."""
     r = requests.get(url, auth=(archive_it_user, archive_it_pw))
     # Write downloaded file
     try:
@@ -154,48 +188,47 @@ def download_metadata_file(url, crawl_num):
         print(Fore.RED + "\nIMPORTANT: Metadata file not found at url: " + url)
         print(Fore.RESET)
         
-# warc write function
 def write_warc(filename, r):
-     with open(os.getcwd() + '/' + filename, 'wb') as f:  
+    """Write the WARC file (filename) from r.content."""
+    with open(os.getcwd() + '/' + filename, 'wb') as f:  
          # COMMENT OUT TO TEST
          f.write(r.content)
          # COMMENT TO RUN
          #print("write_warc not writing for test")
-
-# main function    
+ 
 def main():
     global num_warcs
     global collection_cwd
     global archive_it_user
     global archive_it_pw
-    crawl_nums = []
+    crawl_nums = [] # List of downloaded crawl IDs
     
-    # Get username and password from credentials.env file
+    # Parse username and password from credentials.env file
     with open(env_file) as f:
         for line in f:
             if line.startswith('#'):
                 continue
             key, value = line.strip().split('=', 1)
-            # os.environ[key] = value  # Load to local environ
-            #env_vars.append({'name': key, 'value': value}) # Save to a list
             env_vars[key] = value
     
+    # Set username and password to local variables
     archive_it_user = env_vars['ARCHIVE-IT-USER']
     archive_it_pw = env_vars['ARCHIVE-IT-PWD']
     
     # Prompt for collection number
-    collnum = collnum_prompt()
+    collection_num = collection_num_prompt()
     
-    # Initial request
-    request_string = 'https://warcs.archive-it.org/wasapi/v1/webdata?collection=' + str(collnum)
+    # Initial request to WASAPI
+    request_string = 'https://warcs.archive-it.org/wasapi/v1/webdata?collection=' + str(collection_num)
     request(request_string)
     
-    # If 0 files, do nothing
+    # If WASAPI request returns 0 files, do nothing
     if num_warcs == 0:
-        print("\nNo WARC files in collection " + str(collnum) + "; exiting.")
-    # If files found continue
+        print("\nNo WARC files in collection " + str(collection_num) + "; exiting.")  
+    # If WASAPI request finds files, continue
     else:
-        # Must narrow by date if 100 or more files; indicates incomplete API result.
+        # If there are exactly 100 files, must narrow by date until < 100;
+        # exactly 100 files indicates incomplete results, because limit is 100.
         while num_warcs == 100:
             print((Fore.RED + "\nIMPORTANT: Must use date ranges to narrow to < 100 files."))
             print(Fore.RESET)
@@ -203,8 +236,7 @@ def main():
             if num_warcs == 0:
                 print("\nDate range too narrow; try again.")
                 num_warcs = 100
-        # Give option to narrow by date anyway        
-        # TODO Fix while logic; sometimes loops before request_dates returns
+        # Even if there are < 100 files, give option to narrow results by date        
         while True:
             try:
                 narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
@@ -213,54 +245,59 @@ def main():
                      while num_warcs == 0:
                          print("\nDate range too narrow; try again.")
                          request_dates(request_string)
-                     #break # Uncomment this to stop looping date narrowing prompt
                 elif narrow_by_date == 'n':
                     break
             except:
                 pass
         
-        # Prompt user to download files        
+        # After user declines to narrow further by date, prompt to download files        
         download_files = download_files_prompt()
-            
+        
+        # Download files if users responds with 'y'
         if download_files == 'y':
-            collection_folder = "ARCHIVEIT-" + str(collnum)
+            # Create collection folder, e.g. ARCHIVEIT-1234, if it doesn't exist yet
+            collection_folder = "ARCHIVEIT-" + str(collection_num)
             try:
                 os.mkdir(collection_folder)
             except:
                 pass
-            os.chdir(collection_folder)
-            collection_cwd = os.getcwd()
             
+            os.chdir(collection_folder) # Change directory to collection folder
+            collection_cwd = os.getcwd() # Save the path of the collection folder
+            
+            # For each WARC file listed by WASAPI response
             for warc in warcs:
                 url = warc['file']
                 size = size_string(int(warc['size']))
                 crawl_num = warc['crawl']
-                os.chdir(collection_cwd)
+                
+                os.chdir(collection_cwd) # Change directory (back) to the collection folder
         
-                # Get file name
+                # Get filename of WARC file
                 filename=url.split("https://warcs.archive-it.org/webdatafile/")[1]
                 
-                # Download file
+                # Download WARC file
                 print('\nDownloading ' + filename + ' (' + size + ')...')
-                
-                # COMMENT OUT TO TEST
-                r = requests.get(url, auth=(archive_it_user, archive_it_pw))
-                # COMMENT TO RUN
-                #r = ""
+                r = requests.get(url, auth=(archive_it_user, archive_it_pw)) # TO TEST WITHOUT DOWNLOADING: COMMENT OUT
+                #r = "" # TO TEST WITHOUT DOWNLOADING: UNCOMMENT
                             
-                # Make directory and write downloaded file    
-                # If crawl ID, download to JOB folder, not collection folder
+                # Make package directory for crawl and write downloaded WARC file
+                # Note that if crawl_num is not an int, this means the crawl ID is missing;
+                # without crawl_num, files will download to the collection folder
                 if type(crawl_num) == int:
-                    crawl_folder = "ARCHIVEIT_COLLECTION-" + str(collnum) + "_JOB-" + str(crawl_num)
+                    crawl_folder = "ARCHIVEIT_COLLECTION-" + str(collection_num) + "_JOB-" + str(crawl_num)
+                    # Create package folder, e.g. ARCHIVEIT_COLLECTION-1234_JOB-4567, if it doesn't exist yet
                     try:
                         os.mkdir(crawl_folder)
                     except:
                         pass
                     os.chdir(crawl_folder)
+                    # Make ARCHIVEIT_COLLECTION-1234_JOB-4567/objects (WARCs go here)
                     try:
                         os.mkdir("objects")
                     except:
                         pass
+                    # Make ARCHIVEIT_COLLECTION-1234_JOB-4567/metadata/submissionDocumentation (metadata goes here)
                     try:
                         os.mkdir("metadata")
                         os.chdir("metadata")
@@ -268,16 +305,17 @@ def main():
                         os.chdir('..')
                     except:
                         pass
+                    # Change directory to objects sub-folder
                     os.chdir("objects")
-                    
+                
+                # Write the downloaded WARC file
                 write_warc(filename, r)
                 
-                # Open, close, read file and calculate MD5 on its contents 
+                # Open and read WARC file and compute MD5 on its contents
                 with open(filename, 'rb') as file_to_check:
-                    # read contents of the file
-                    data = file_to_check.read()    
-                    # pipe contents of the file through
-                    md5_returned = hashlib.md5(data).hexdigest()
+                    data = file_to_check.read()# read contents of the file   
+                    md5_returned = hashlib.md5(data).hexdigest() # pipe contents of the file through
+                    # Compare computed MD5 with checksum from WASAPI
                     if md5_returned == warc['md5']:
                         print("md5 match: " + md5_returned)
                     else:
@@ -285,12 +323,13 @@ def main():
                               + " should be " + warc['md5'])
                         print(Fore.RESET)
                    
-                # Download crawl metadata
+                # Download crawl metadata files to metadata/submissionDocumentation
                 if type(crawl_num) == int and crawl_num not in crawl_nums:
+                    # Change directory to metadata/submissionDocumentation folder
                     os.chdir("..")
                     os.chdir("metadata/submissionDocumentation")
                    
-                    # Download seed, host, and mimetype lists
+                    # URLs for metadata file downloads
                     seed_list_url = ('https://partner.archive-it.org/api/reports/seed/' 
                                      + str(crawl_num) + '?format=csv&limit=1000000')
                     host_list_url = ('https://partner.archive-it.org/api/reports/host/' 
@@ -298,10 +337,12 @@ def main():
                     mimetype_list_url = ('https://partner.archive-it.org/api/reports/mimetype/' 
                                          + str(crawl_num) + '?format=csv&limit=1000000')
                    
+                    # Download seed, host, and mimetype lists as csv files
                     download_metadata_file(seed_list_url, crawl_num)
                     download_metadata_file(host_list_url, crawl_num)
                     download_metadata_file(mimetype_list_url, crawl_num)
                     
+                    # After metadata has downloaded, add crawl ID to list of downloaded crawls
                     crawl_nums.append(crawl_num)
         
 
