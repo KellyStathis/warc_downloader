@@ -66,7 +66,7 @@ def crawl_time_after_prompt():
             pass
 
 def download_files_prompt():
-    """Prompts the user to download files (y or n) and returns result."""
+    """Prompts the user to download files and returns result (y or n)."""
     while True:
         try:
             download_files = str(input('Download files? Enter y or n: '))
@@ -177,7 +177,7 @@ def request_dates(request_string):
 def download_metadata_file(url, crawl_num): # TODO: don't pass crawl_num
     """Download the metadata file at url."""
     r = requests.get(url, auth=(archive_it_user, archive_it_pw))
-    # Write downloaded file
+    # Write downloaded metadata file
     try:
         filename = r.headers.get('content-disposition').split("filename=")[1] \
                         .split("\"")[1].replace(":", "_")
@@ -237,7 +237,7 @@ def main():
                 print("\nDate range too narrow; try again.")
                 num_warcs = 100
         # Even if there are < 100 files, give option to narrow results by date        
-        while True:
+        while True: # TODO Fix while logic - sometimes loops before request_dates returns
             try:
                 narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
                 if narrow_by_date.lower() == 'y':
