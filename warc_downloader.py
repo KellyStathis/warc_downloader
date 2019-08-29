@@ -102,9 +102,6 @@ def is_date(crawl_time):
         year = int(ymd[0])
         month = int(ymd[1])
         day = int(ymd[2])
-    except:
-        return False
-    try:
         datetime.date(year, month, day)
         return True
     except:
@@ -275,7 +272,7 @@ def main():
                 # without crawl_num, files will download to the collection folder
                 if type(crawl_num) == int:
                     crawl_folder = "ARCHIVEIT_COLLECTION-" + str(collection_num) + "_JOB-" + str(crawl_num)
-                    # Create package folder, e.g. ARCHIVEIT_COLLECTION-1234_JOB-4567, if it doesn't exist yet
+                    # Create package folder for crawl, e.g. ARCHIVEIT_COLLECTION-1234_JOB-4567
                     try:
                         os.mkdir(crawl_folder)
                     except:
