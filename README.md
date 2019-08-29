@@ -14,13 +14,19 @@ The code was developed as part of a Professional Experience project at the UBC i
       * \<seed-list csv\>
     * objects
       * \<WARC file(s)\>
+      
+[explain what these csv files contain, caveat that they are not descriptive metadata - which must be downloaded separately]
 
 ## Prequisites
 1. [Python 3](https://www.python.org/downloads/)
 2. [pipenv](https://docs.pipenv.org/en/latest/)
 
-## Description of files
-[brief description of each file]
+## Project Files
+| Filename          | Description |
+|--------------------|-------------|
+| credentials.env    | Sample file - edit with your credentials |
+| Pipfile            | Pipfile containing dependencies |
+| warc_downloader.py | Main script |
 
 ## Setup
 1. Clone or download this repoistory
