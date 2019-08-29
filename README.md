@@ -4,16 +4,16 @@ This project is a Python script that Archive-It partners can use to download the
 ## Overview
 This script uses Archive-It's [Web Archiving Systems API (WASAPI)](https://warcs.archive-it.org/wasapi/v1/webdata) and [Partner API](https://partner.archive-it.org/api/) to download WARC files and associated metadata.
 
-The code was developed as part of a Professional Experience project at the UBC iSchool for use by UBC Library Digital Initiatives, with the goal of digitally preserving downloaded WARC files in Archivematica. For this reason, the downlaods are organized in the following package structure:
+The code was developed as part of a Professional Experience project at the UBC iSchool for use by UBC Library Digital Initiatives, with the goal of digitally preserving downloaded WARC files in Archivematica. For this reason, the downloads are organized in the following package structure:
 
-* ARCHIVEIT_COLLECTION-<collection number>_JOB-<crawl ID>
+* ARCHIVEIT_COLLECTION-\<collection number\>_JOB-\<crawl ID\>
   * metadata
     * submissionDocumentation
-      * *host-list csv*
-      * *mimetype-list csv*
-      * *seed-list csv*
+      * \<host-list csv\>
+      * \<mimetype-list csv\>
+      * \<seed-list csv\>
     * objects
-      * *WARC file(s)*
+      * \<WARC file(s)\>
 
 ## Prequisites
 1. [Python 3](https://www.python.org/downloads/)
