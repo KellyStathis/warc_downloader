@@ -9,6 +9,7 @@ Created on Thu May 23 15:42:08 2019
 import requests
 import hashlib
 import os
+import datetime
 from colorama import Fore
 
 # Global variables
@@ -38,7 +39,7 @@ def collection_num_prompt():
 def crawl_time_before_prompt():
     """Prompt the user for end date in YYYY-MM-DD format  and returns response if valid.
     
-    'Before' means that all WARCs before this date are returned by WASAPI.
+    'Before' means that WARCs before this date are returned by WASAPI.
     Note that the  end date is not inclusive.
     For example, to get all files from 2019, use start date 2019-01-01 and end date 2020-01-01.
     """
@@ -54,7 +55,7 @@ def crawl_time_before_prompt():
 def crawl_time_after_prompt():
     """Prompt the user for start date in YYYY-MM-DD format and returns response if valid.
     
-    'After' means that all WARCs after this date are returned by WASAPI.
+    'After' means that WARCs after this date are returned by WASAPI.
     """
     while True:
         try:
@@ -103,17 +104,11 @@ def is_date(crawl_time):
         day = int(ymd[2])
     except:
         return False
-    if year < 2000:
+    try:
+        datetime.date(year, month, day)
+        return True
+    except:
         return False
-    if month < 0 or month > 12:
-        return False
-    if day < 0 or day > 31:
-        return False
-    if month == 2 and day > 29:
-        return False
-    if month in [4, 6, 9, 11] and day > 30:
-        return False
-    return True
     
 def request(request_string):
     """Makes request to WASAPI to get information about WARC files.
@@ -247,7 +242,7 @@ def main():
         # After user declines to narrow further by date, prompt to download files        
         download_files = download_files_prompt()
         
-        # Download files if users responds with 'y'
+        # Download files if user responds with 'y'
         if download_files == 'y':
             # Create collection folder, e.g. ARCHIVEIT-1234, if it doesn't exist yet
             collection_folder = "ARCHIVEIT-" + str(collection_num)
