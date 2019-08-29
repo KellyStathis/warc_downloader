@@ -69,12 +69,8 @@ def download_files_prompt():
     """Prompts the user to download files and returns result (y or n)."""
     while True:
         try:
-            download_files = str(input('Download files? Enter y or n: '))
-            if download_files.lower() == 'y':
-                num_warcs == len(warcs) #TODO: Move this to main?
-                return download_files
-                break
-            elif download_files == 'n':
+            download_files = str(input('Download files? Enter y or n: ')).lower()
+            if download_files == 'y' or download_files == 'n':
                 return download_files
                 break
         except:
@@ -174,7 +170,7 @@ def request_with_dates(request_string):
     
     request(request_string)
     
-def download_metadata_file(url, crawl_num): # TODO: don't pass crawl_num
+def download_metadata_file(url):
     """Download the metadata file at url."""
     r = requests.get(url, auth=(archive_it_user, archive_it_pw))
     # Write downloaded metadata file
@@ -191,10 +187,8 @@ def download_metadata_file(url, crawl_num): # TODO: don't pass crawl_num
 def write_warc(filename, r):
     """Write the WARC file (filename) from r.content."""
     with open(os.getcwd() + '/' + filename, 'wb') as f:  
-         # COMMENT OUT TO TEST
-         f.write(r.content)
-         # COMMENT TO RUN
-         #print("write_warc not writing for test")
+         f.write(r.content) # TO TEST WITHOUT DOWNLOADING: COMMENT OUT
+         #print("write_warc not writing for test") # TO TEST WITHOUT DOWNLOADING: UNCOMMENT
  
 def main():
     global num_warcs
@@ -237,10 +231,10 @@ def main():
                 print("\nDate range too narrow; try again.")
                 num_warcs = 100
         # Even if there are < 100 files, give option to narrow results by date        
-        while True: # TODO Fix while logic - sometimes loops before request_with_dates changes num_warcs
+        while True:
             try:
-                narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: '))
-                if narrow_by_date.lower() == 'y':
+                narrow_by_date = str(input('Would you like to narrow further by date? Enter y or n: ')).lower()
+                if narrow_by_date == 'y':
                      request_with_dates(request_string)
                      while num_warcs == 0:
                          print("\nDate range too narrow; try again.")
@@ -338,9 +332,9 @@ def main():
                                          + str(crawl_num) + '?format=csv&limit=1000000')
                    
                     # Download seed, host, and mimetype lists as csv files
-                    download_metadata_file(seed_list_url, crawl_num)
-                    download_metadata_file(host_list_url, crawl_num)
-                    download_metadata_file(mimetype_list_url, crawl_num)
+                    download_metadata_file(seed_list_url)
+                    download_metadata_file(host_list_url)
+                    download_metadata_file(mimetype_list_url)
                     
                     # After metadata has downloaded, add crawl ID to list of downloaded crawls
                     crawl_nums.append(crawl_num)
