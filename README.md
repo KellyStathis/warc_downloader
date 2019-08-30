@@ -2,9 +2,9 @@
 This project is a Python script that Archive-It partners can use to download their WARC files and associated metadata. 
 
 ## Overview
-This script uses Archive-It's [Web Archiving Systems API (WASAPI)](https://warcs.archive-it.org/wasapi/v1/webdata) and [Partner API](https://partner.archive-it.org/api/) to download WARC files and associated metadata.
+This script uses Archive-It's [Web Archiving Systems API (WASAPI)](https://warcs.archive-it.org/wasapi/v1/webdata) and [Partner API](https://partner.archive-it.org/api/) to download WARC files and associated metadata. The code was developed as part of a Professional Experience project at the UBC iSchool for use by UBC Library Digital Initiatives, with the goal of digitally preserving WARC files captured using Archive-It.
 
-The code was developed as part of a Professional Experience project at the UBC iSchool for use by UBC Library Digital Initiatives, with the goal of digitally preserving WARC files captured using Archive-It. Because the files will be preserved in Archivematica, the script organizes downloads in the following Submission Information Package structure:
+Because the files will be preserved in Archivematica, the script organizes downloads in the following Submission Information Package (SIP) structure:
 
 * ARCHIVEIT_COLLECTION-\<collection number\>_JOB-\<crawl ID\>
   * metadata
@@ -17,7 +17,7 @@ The code was developed as part of a Professional Experience project at the UBC i
       
 Each package contains one crawl's WARC files and administrative metadata. At present, descriptive metadata is not downloaded by this script.
 
-## Prequisites
+## Prerequisites
 1. [Python 3](https://www.python.org/downloads/)
 2. [pipenv](https://docs.pipenv.org/en/latest/)
 
@@ -29,7 +29,7 @@ Each package contains one crawl's WARC files and administrative metadata. At pre
 | credentials.env    | Example file – edit with your Archive-It credentials |
 
 ## Setup
-1. Clone or download this repoistory
+1. Clone or download this repository
 2. Run `pipenv install` within the project folder
 3. Edit credentials.env, replacing sampleUsername and samplePassword with your Archive-It credentials
 
