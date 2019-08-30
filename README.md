@@ -24,9 +24,9 @@ Each package contains one crawl's WARC files and administrative metadata. At pre
 ## Project Files
 | Filename          | Description |
 |--------------------|-------------|
-| credentials.env    | Example file – edit with your Archive-It credentials |
-| Pipfile            | Pipfile containing dependencies |
 | warc_downloader.py | Main script |
+| Pipfile            | Pipfile containing dependencies |
+| credentials.env    | Example file – edit with your Archive-It credentials |
 
 ## Setup
 1. Clone or download this repoistory
@@ -40,10 +40,10 @@ Each package contains one crawl's WARC files and administrative metadata. At pre
 
 | Prompt | Notes |
 | --- | --- |
-|  `Enter collection number:` | Enter the collection number to download WARC files from | 
+|  `Enter collection number:` | Enter the collection number from which to download WARC files. | 
 |  `Would you like to narrow further by date? Enter y or n:` |  `y` to provide a date range for which WARC files to download, `n` to proceed with current results. <br>If a collection has > 100 files, the initial query will only return 100 files, and you will be required to narrow the results by date. | 
-|  `Enter a start date (YYYY-MM-DD):`  | Enter the earliest date for which to retrieve WARC files | 
-|  `Enter an end date (YYYY-MM-DD):` | Enter the latest date for which to retrieve WARC files | 
-|  `Download files? Enter y or n:` | `y` to download files, `n` to cancel | 
+|  `Enter a start date (YYYY-MM-DD):`  | Enter the earliest date for which to retrieve WARC files. | 
+|  `Enter an end date (YYYY-MM-DD):` | Enter the latest date for which to retrieve WARC files.<br>Note that the end date is not inclusive. For example, to get all files from 2019, use start date 2019-01-01 and end date 2020-01-01. | 
+|  `Download files? Enter y or n:` | `y` to download files, `n` to exit. | 
 
 3. As the files download, scan for any output in red text. The script will indicate if there is any file corruption (md5 checksum did not match) or missing metadata files.
