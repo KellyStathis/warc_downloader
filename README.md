@@ -21,6 +21,10 @@ Each package contains one crawl's WARC files and administrative metadata. At pre
 1. [Python 3](https://www.python.org/downloads/)
 2. [pipenv](https://docs.pipenv.org/en/latest/)
 
+## Dependencies
+* [requests](https://2.python-requests.org/en/master/)
+* [colorama](https://pypi.org/project/colorama/)
+
 ## Project Files
 | Filename          | Description |
 |--------------------|-------------|
